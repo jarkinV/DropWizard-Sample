@@ -1,4 +1,3 @@
-template: pararam
 server:
   type: simple
   applicationContextPath: /
@@ -6,3 +5,5 @@ server:
   connector:
     type: http
     port: 8080
+swagger:
+  resourcePackage: com.softserve.resource

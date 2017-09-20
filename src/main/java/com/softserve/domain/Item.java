@@ -1,3 +1,4 @@
+
 package com.softserve.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,11 +13,11 @@ public class Item {
     }
 
     public Item(long id, String text, String state) {
-		super();
-		this.id = id;
-		this.text = text;
-		this.state = state;
-	}
+        super();
+        this.id = id;
+        this.text = text;
+        this.state = state;
+    }
 
     @JsonIgnore
     public long getId() {
@@ -27,9 +28,9 @@ public class Item {
     public String getText() {
         return text;
     }
-    
+
     @JsonProperty
-	public String getState() {
-		return state;
-	}
+    public String getState() {
+        return state;
+    }
 }

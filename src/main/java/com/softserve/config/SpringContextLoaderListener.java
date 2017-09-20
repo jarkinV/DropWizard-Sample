@@ -1,3 +1,4 @@
+
 package com.softserve.config;
 
 import javax.servlet.ServletContextEvent;
@@ -9,14 +10,13 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 public class SpringContextLoaderListener implements ServletContextListener {
 
     private final AnnotationConfigWebApplicationContext context;
-    
-    
-    public SpringContextLoaderListener(AnnotationConfigWebApplicationContext context) {
-		super();
-		this.context = context;
-	}
 
-	@Override
+    public SpringContextLoaderListener(AnnotationConfigWebApplicationContext context) {
+        super();
+        this.context = context;
+    }
+
+    @Override
     public void contextInitialized(ServletContextEvent sce) {
         sce.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, context);
         context.setServletContext(sce.getServletContext());
@@ -24,6 +24,6 @@ public class SpringContextLoaderListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        //do nothing
+        // do nothing
     }
 }

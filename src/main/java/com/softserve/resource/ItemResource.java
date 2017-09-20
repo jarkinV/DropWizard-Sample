@@ -1,3 +1,4 @@
+
 package com.softserve.resource;
 
 import java.util.List;
@@ -26,37 +27,37 @@ import io.swagger.annotations.Api;
 @Controller
 public class ItemResource {
 
-	@Autowired
-	private ItemDaoImp itemDao;
+    @Autowired
+    private ItemDaoImp itemDao;
 
-	@PUT
-	public ResponseEntity<Object> saveItem(Item item) {
-		return (itemDao.save(item)) ? new ResponseEntity<>(HttpStatus.OK)
-				: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
+    @PUT
+    public ResponseEntity<Object> saveItem(Item item) {
+        return (itemDao.save(item)) ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
-	@GET
-	public ResponseEntity<List<Item>> getAllItems() {
-		return new ResponseEntity<List<Item>>(itemDao.findAll(), HttpStatus.OK);
-	}
+    @GET
+    public ResponseEntity<List<Item>> getAllItems() {
+        return new ResponseEntity<List<Item>>(itemDao.findAll(), HttpStatus.OK);
+    }
 
-	@GET
-	@Path("/{id}")
-	public ResponseEntity<Item> getOneItemById(@PathParam("id") int id) {
-		return new ResponseEntity<Item>(itemDao.findOne(id), HttpStatus.OK);
-	}
+    @GET
+    @Path("/{id}")
+    public ResponseEntity<Item> getOneItemById(@PathParam("id") int id) {
+        return new ResponseEntity<Item>(itemDao.findOne(id), HttpStatus.OK);
+    }
 
-	@DELETE
-	@Path("/{id}")
-	public ResponseEntity<Object> removeItemById(@PathParam("id") int id) {
-		return (itemDao.removeById(id)) ? new ResponseEntity<>(HttpStatus.OK)
-				: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
+    @DELETE
+    @Path("/{id}")
+    public ResponseEntity<Object> removeItemById(@PathParam("id") int id) {
+        return (itemDao.removeById(id)) ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
-	@DELETE
-	public ResponseEntity<Object> removeItem(Item item) {
-		return (itemDao.remove(item)) ? new ResponseEntity<>(HttpStatus.OK)
-				: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
+    @DELETE
+    public ResponseEntity<Object> removeItem(Item item) {
+        return (itemDao.remove(item)) ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
 }

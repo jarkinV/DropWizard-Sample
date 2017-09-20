@@ -1,3 +1,4 @@
+
 package com.softserve;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 import com.softserve.config.MainConfiguration;
 import com.softserve.config.SpringContextLoaderListener;
+import com.softserve.healthCheck.DBHealthCheck;
 import com.softserve.resource.ItemResource;
 
 import io.dropwizard.Application;
@@ -19,48 +21,50 @@ import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
 public class MainApplication extends Application<MainConfiguration> {
 
-	public static void main(String[] args) throws Exception {
-		new MainApplication().run(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new MainApplication().run(args);
+    }
 
-	@Override
-	public void initialize(Bootstrap<MainConfiguration> bootstrap) {
-		bootstrap.addBundle(new SwaggerBundle<MainConfiguration>() {
-			@Override
-			protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(MainConfiguration configuration) {
-				return configuration.swaggerBundleConfiguration;
-			}
-		});
-	}
+    @Override
+    public void initialize(Bootstrap<MainConfiguration> bootstrap) {
+        bootstrap.addBundle(new SwaggerBundle<MainConfiguration>() {
+            @Override
+            protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(MainConfiguration configuration) {
+                return configuration.swaggerBundleConfiguration;
+            }
+        });
+    }
 
-	public void run(MainConfiguration configuration, Environment environment) throws Exception {
-		setUpSpringContext(configuration, environment);
-		environment.jersey().register(new ItemResource());
-	}
+    public void run(MainConfiguration configuration, Environment environment) throws Exception {
+        setUpSpringContext(configuration, environment);
+        environment.healthChecks().register("DBCheck", new DBHealthCheck(null));
+        environment.jersey().register(new ItemResource());
+    }
 
-	private void setUpSpringContext(MainConfiguration configuration, Environment environment) {
-		AnnotationConfigWebApplicationContext parent = new AnnotationConfigWebApplicationContext();
-		AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-		parent.refresh();
-		parent.getBeanFactory().registerSingleton("configuration", configuration);
-		parent.registerShutdownHook();
-		parent.start();
+    private void setUpSpringContext(MainConfiguration configuration, Environment environment) {
+        AnnotationConfigWebApplicationContext parent = new AnnotationConfigWebApplicationContext();
+        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+        parent.refresh();
+        parent.getBeanFactory().registerSingleton("configuration", configuration);
+        parent.registerShutdownHook();
+        parent.start();
 
-		ctx.setParent(parent);
-		ctx.register(MainSpringConfiguration.class);
-		ctx.refresh();
-		ctx.registerShutdownHook();
-		ctx.start();
+        ctx.setParent(parent);
+        ctx.register(MainSpringConfiguration.class);
+        ctx.refresh();
+        ctx.registerShutdownHook();
+        ctx.start();
 
-		Arrays.asList(ctx.getBeanDefinitionNames()).forEach(System.out::println);
+        Arrays.asList(ctx.getBeanDefinitionNames()).forEach(System.out::println);
 
-		// resources
-		Map<String, Object> resources = ctx.getBeansWithAnnotation(Path.class);
-		for (Map.Entry<String, Object> entry : resources.entrySet()) {
-			environment.jersey().register(entry.getValue());
-		}
+        // resources
+        Map<String, Object> resources = ctx.getBeansWithAnnotation(Path.class);
+        for (Map.Entry<String, Object> entry : resources.entrySet()) {
+            environment.jersey().register(entry.getValue());
+        }
 
-		// last, but not least,let's link Spring to the embedded Jetty in Dropwizard
-		environment.servlets().addServletListeners(new SpringContextLoaderListener(ctx));
-	}
+        // last, but not least,let's link Spring to the embedded Jetty in
+        // Dropwizard
+        environment.servlets().addServletListeners(new SpringContextLoaderListener(ctx));
+    }
 }

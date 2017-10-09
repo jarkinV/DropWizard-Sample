@@ -18,9 +18,9 @@ public class MainSpringConfiguration {
     private String databaseDriver;
     @Value("${database.password}")
     private String databasePassword;
-    @Value("${database.password}")
+    @Value("${database.url}")
     private String databaseUrl;
-    @Value("${database.password}")
+    @Value("${database.username}")
     private String databaseUsername;
 
     @Bean
@@ -32,6 +32,4 @@ public class MainSpringConfiguration {
         dataSource.setPassword(databasePassword);
         return dataSource;
     }
-    
-    
 }

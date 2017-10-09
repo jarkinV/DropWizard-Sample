@@ -4,6 +4,7 @@ package com.softserve;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.sql.DataSource;
 import javax.ws.rs.Path;
 
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -21,6 +22,8 @@ import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
 public class MainApplication extends Application<MainConfiguration> {
 
+    AnnotationConfigWebApplicationContext ctx;
+
     public static void main(String[] args) throws Exception {
         new MainApplication().run(args);
     }
@@ -37,13 +40,14 @@ public class MainApplication extends Application<MainConfiguration> {
 
     public void run(MainConfiguration configuration, Environment environment) throws Exception {
         setUpSpringContext(configuration, environment);
-        environment.healthChecks().register("DBCheck", new DBHealthCheck(null));
+        DataSource dataSource = (DataSource) ctx.getBean("dataSource");
+        environment.healthChecks().register("DataBase", new DBHealthCheck(dataSource));
         environment.jersey().register(new ItemResource());
     }
 
     private void setUpSpringContext(MainConfiguration configuration, Environment environment) {
         AnnotationConfigWebApplicationContext parent = new AnnotationConfigWebApplicationContext();
-        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+        ctx = new AnnotationConfigWebApplicationContext();
         parent.refresh();
         parent.getBeanFactory().registerSingleton("configuration", configuration);
         parent.registerShutdownHook();

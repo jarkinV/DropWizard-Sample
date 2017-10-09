@@ -2,12 +2,15 @@
 package com.softserve.dao;
 
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
 import com.softserve.domain.Item;
@@ -16,10 +19,12 @@ import com.softserve.domain.Item;
 public class ItemDaoImp implements BaseDao<Item> {
 
     private JdbcTemplate jdbcTemplate;
+    private SimpleJdbcInsert insertItem;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.insertItem = new SimpleJdbcInsert(dataSource).withTableName("Item");
     }
 
     @Override
@@ -30,10 +35,11 @@ public class ItemDaoImp implements BaseDao<Item> {
     }
 
     @Override
-    public boolean save(Item item) {
-        String sql = "INSERT INTO Item (text, state) VALUES (?, ?)";
-        int result = jdbcTemplate.update(sql, item.getText(), item.getState());
-        return (result > 0) ? true : false;
+    public void save(Item item) {
+        Map<String, Object> data = new HashMap<>(2);
+        data.put("text", item.getText());
+        data.put("state", item.getState());
+        insertItem.execute(data);
     }
 
     @Override
@@ -52,8 +58,8 @@ public class ItemDaoImp implements BaseDao<Item> {
 
     @Override
     public Item findOne(int id) {
-        String sql = "SELECT * FROM item WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[] { id },
+        String sql = "SELECT * FROM item WHERE Id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id},
                 (ResultSet rs, int rowNum) -> new Item(rs.getInt("Id"), rs.getString("text"), rs.getString("state")));
     }
 }

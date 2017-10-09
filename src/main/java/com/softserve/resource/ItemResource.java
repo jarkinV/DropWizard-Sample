@@ -9,6 +9,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Controller;
 
 import com.softserve.dao.ItemDaoImp;
 import com.softserve.domain.Item;
+import com.softserve.domain.Record;
+import com.softserve.service.KafkaUtil;
 
 import io.swagger.annotations.Api;
 
@@ -30,10 +33,27 @@ public class ItemResource {
     @Autowired
     private ItemDaoImp itemDao;
 
+    @Autowired
+    private KafkaUtil kafkaUtil;
+
+    @PUT
+    @Path("/kafka")
+    public ResponseEntity<Object> sendMessageToKafka(@QueryParam("message") String message) {
+        kafkaUtil.sendMessage(message);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    @GET
+    @Path("/kafka")
+    public ResponseEntity<List<Record>> getMessageFromKafka(){
+        List<Record> records = kafkaUtil.getMessage();
+        return new ResponseEntity<List<Record>>(records, HttpStatus.OK);
+    }
+    
     @PUT
     public ResponseEntity<Object> saveItem(Item item) {
-        return (itemDao.save(item)) ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        itemDao.save(item);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GET
